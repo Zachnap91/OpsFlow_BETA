@@ -33,3 +33,13 @@ Prerequisites: Python 3.12, Node.js 22 or newer, and npm.
 1. Run `setup-mac.sh` once.
 2. Run `start-mac.sh`.
 3. Open <http://localhost:5173>.
+
+## Configuration
+
+The backend reads these optional environment variables:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | not set | Enables model-based triage recommendations. If unset, the local engine is used. |
+| `OPENAI_MODEL` | `gpt-5-mini` | Model used for triage when `OPENAI_API_KEY` is set. |
+| `OPERATIONS_DB_PATH` | `backend/operations.db` | Location of the SQLite database file. |
