@@ -36,12 +36,14 @@ Prerequisites: Python 3.12, Node.js 22 or newer, and npm.
 
 ## Manual setup
 
+Run the backend and frontend in two separate Terminal windows or tabs. All commands start from the `Ops_Triage_Mac` folder.
+
 ### Backend
 
 ```bash
 cd backend
-python -m venv .venv
-.venv/Scripts/activate
+python3.12 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements-dev.txt
 uvicorn app.main:app --reload
 ```
@@ -60,10 +62,11 @@ The interface will be available at <http://localhost:5173>.
 
 ### Optional demo data
 
-With the backend virtual environment activated, run:
+From the `Ops_Triage_Mac` folder, run:
 
 ```bash
 cd backend
+source .venv/bin/activate
 python seed_demo.py
 ```
 
@@ -71,12 +74,14 @@ The seed script adds three realistic operational requests only when the database
 
 ## Optional model-based triage
 
-Set these environment variables before starting the backend:
+In the Terminal window where you will start the backend, export these environment variables before running `uvicorn`:
 
-```text
-OPENAI_API_KEY=your_api_key
-OPENAI_MODEL=gpt-5-mini
+```bash
+export OPENAI_API_KEY=your_api_key
+export OPENAI_MODEL=gpt-5-mini
 ```
+
+These only last for that Terminal session. `start-mac.sh` opens new Terminal windows that won't inherit them, so start the backend manually when using model-based triage.
 
 Never commit an API key. The `.gitignore` excludes `.env` files.
 
@@ -94,8 +99,11 @@ Never commit an API key. The `.gitignore` excludes `.env` files.
 
 ## Tests
 
+From the `Ops_Triage_Mac` folder, run:
+
 ```bash
 cd backend
+source .venv/bin/activate
 pytest -q
 ```
 
