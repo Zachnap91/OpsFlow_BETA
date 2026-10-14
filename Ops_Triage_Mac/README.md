@@ -34,12 +34,91 @@ Prerequisites: Python 3.12, Node.js 22 or newer, and npm.
 2. Run `start-mac.sh`.
 3. Open <http://localhost:5173>.
 
-## Configuration
+## Manual setup
 
-The backend reads these optional environment variables:
+### Backend
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `OPENAI_API_KEY` | not set | Enables model-based triage recommendations. If unset, the local engine is used. |
-| `OPENAI_MODEL` | `gpt-5-mini` | Model used for triage when `OPENAI_API_KEY` is set. |
-| `OPERATIONS_DB_PATH` | `backend/operations.db` | Location of the SQLite database file. |
+```bash
+cd backend
+python -m venv .venv
+.venv/Scripts/activate
+pip install -r requirements-dev.txt
+uvicorn app.main:app --reload
+```
+
+The API will be available at <http://127.0.0.1:8000>. Interactive API documentation is available at <http://127.0.0.1:8000/docs>.
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The interface will be available at <http://localhost:5173>.
+
+### Optional demo data
+
+With the backend virtual environment activated, run:
+
+```bash
+cd backend
+python seed_demo.py
+```
+
+The seed script adds three realistic operational requests only when the database is empty.
+
+## Optional model-based triage
+
+Set these environment variables before starting the backend:
+
+```text
+OPENAI_API_KEY=your_api_key
+OPENAI_MODEL=gpt-5-mini
+```
+
+Never commit an API key. The `.gitignore` excludes `.env` files.
+
+## API endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/health` | Service health check |
+| GET | `/api/requests` | List and filter requests |
+| POST | `/api/requests` | Create and automatically triage a request |
+| GET | `/api/requests/{id}` | Get details and activity history |
+| PATCH | `/api/requests/{id}` | Update ownership, status, or classification |
+| POST | `/api/requests/{id}/approve-triage` | Confirm or correct the triage recommendation |
+| GET | `/api/stats` | Dashboard summary metrics |
+
+## Tests
+
+```bash
+cd backend
+pytest -q
+```
+
+The integration test creates a request, validates automated triage, records human approval, assigns an owner, changes status, checks activity history, and verifies dashboard statistics.
+
+## Design decisions and tradeoffs
+
+- **SQLite first:** keeps the project easy to run while preserving a clean path to PostgreSQL.
+- **Human-reviewed AI:** AI recommends; a person decides. This keeps accountability visible.
+- **Local fallback:** the demonstration works without secrets, cost, or network access.
+- **Simple authentication boundary:** authentication is intentionally excluded from version 1. A production version would add single sign-on and server-enforced roles.
+- **Audit history:** meaningful changes are recorded so users can see who changed what and when.
+
+## Responsible use of agentic coding
+
+This project was developed with an agentic coding assistant. The problem definition, workflow, acceptance criteria, architecture review, testing, and documentation remain human responsibilities. Every important code path should be reviewed and explainable by the repository owner before it is presented in an interview.
+
+## Suggested next improvements
+
+- Add OpenID Connect login and role-based authorization
+- Replace SQLite with PostgreSQL and database migrations
+- Deploy the frontend and API to AWS
+- Add structured logging, metrics, and alerting
+- Add browser-based end-to-end tests
+- Connect an enterprise source such as an ERP, HRIS, or quality system
+- Add service-level targets and overdue-request notifications
